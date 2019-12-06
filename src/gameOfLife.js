@@ -11,9 +11,9 @@ class Field {
 class GameArea {
     constructor(sizeOfColumn) {
         this.columnSize = sizeOfColumn;
-        this.size = sizeOfColumn*sizeOfColumn;
+        this.size = sizeOfColumn * sizeOfColumn;
         this.area = [];
-        for(let i=0; i<this.size; i++){
+        for (let i = 0; i < this.size; i++) {
             this.area.push(new Field(i));
         }
     }
@@ -27,12 +27,12 @@ class GameArea {
         const wsp = mapTo2d(id, this.columnSize);
 
         let out = [
-            {x:wsp.x-1, y:wsp.y-1}, {x:wsp.x, y:wsp.y-1}, {x:wsp.x+1, y:wsp.y-1},
-            {x:wsp.x-1, y:wsp.y}, {x:wsp.x+1, y:wsp.y},
-            {x:wsp.x-1, y:wsp.y+1}, {x:wsp.x, y:wsp.y+1}, {x:wsp.x+1, y:wsp.y+1}
+            { x: wsp.x - 1, y: wsp.y - 1 }, { x: wsp.x, y: wsp.y - 1 }, { x: wsp.x + 1, y: wsp.y - 1 },
+            { x: wsp.x - 1, y: wsp.y }, { x: wsp.x + 1, y: wsp.y },
+            { x: wsp.x - 1, y: wsp.y + 1 }, { x: wsp.x, y: wsp.y + 1 }, { x: wsp.x + 1, y: wsp.y + 1 }
         ];
 
-        const bond = (x) => x>=0 && x<this.columnSize;
+        const bond = (x) => x >= 0 && x < this.columnSize;
         out = out.filter((coord) => {
             return bond(coord.x) && bond(coord.y);
         });
@@ -40,22 +40,26 @@ class GameArea {
         return out.map((coord) => mapTo1d(coord, this.columnSize));
     }
 
-// dead with 3 alive nei -> revive
-// live with 2 or 3 alive -> alive
-// live with other -> dead
+    // dead with 3 alive nei -> revive
+    // live with 2 or 3 alive -> alive
+    // live with other -> dead
     processCell(id) {
-        const nei = this.getNeighbourIds(id);
-        const aliveNei = nei.filter(i => this.isAlive(i));
-
-        console.log('processing ' + id + '. ' + aliveNei);
+        const nei = this.getNeighbourIds(id)
+            .filter(i => this.isAlive(i))
+            .length;
+        
         if (this.isAlive(id)) {
-            if (aliveNei.length !== 2 && aliveNei.length !== 3) {
-                console.log('cell ' + id + ' killed!');
+            if (nei !== 2 && nei !== 3) {
                 this.kill(id);
             }
-        } else if (aliveNei.length === 3) {
-            console.log('cell ' + id + ' revived');
+        } else if (nei === 3) {
             this.revive(id);
+        }
+    }
+
+    processLifeCycle() {
+        for (let i = 0; i < this.getSize(); i++) {
+            this.processCell(i);
         }
     }
 }

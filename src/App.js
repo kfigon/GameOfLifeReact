@@ -1,23 +1,6 @@
 import React from 'react';
 import { GameArea } from './gameOfLife'
 
-const Cell = (props) => {
-  const getStyle = (props) => {
-    const color = props.isAlive ? 'black' : 'white';
-
-    return {
-      backgroundColor: color,
-      border: '1px solid',
-      borderColor: "black",
-      padding: 30
-    };
-  }
-
-  return (
-    <div key={props.id} onClick={props.handler} style={getStyle(props)}></div>
-  );
-}
-
 export default class App extends React.Component{
   constructor() {
     super();
@@ -38,28 +21,20 @@ export default class App extends React.Component{
   }
 
   createCells = () => {
-    let t = [];
-    let g = this.state.gameState;
-    for (let i = 0; i < g.size; i++) {
-      t.push(<Cell handler={() => this.clickOnCell(i)}
-        isAlive={g.isAlive(i)}
-        id={i}></Cell>)
-    }
-    return t;
+    return [...Array(this.state.gameState.getSize()).keys()]
+      .map(i => <Cell handler={() => this.clickOnCell(i)} isAlive={this.state.gameState.isAlive(i)} key={i} />);
   }
 
   cycleLife = () => {
     let g = this.state.gameState;
-    for (let i = 0; i < g.getSize(); i++) {
-      g.processCell(i);
-    }
-
+    g.processLifeCycle();
     this.setState(g);
   };
 
   startAutoCycle = () => {
     setInterval(() => this.cycleLife(), 2000);
   }
+
   render() {
     return (
       <div>
@@ -71,6 +46,20 @@ export default class App extends React.Component{
       </div>
     )
   }
+}
+
+const Cell = (props) => {
+  return (
+    <div onClick={props.handler}
+      style={
+        {
+          backgroundColor: props.isAlive ? 'black' : 'white',
+          border: '1px solid',
+          borderColor: "black",
+          padding: 30
+        }
+      }></div>
+  );
 }
 
 const getGridStyle = (size) => {
